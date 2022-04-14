@@ -1,5 +1,9 @@
 package main
 
+import (
+    "math/rand"
+)
+
 // InsertionSort 插入排序(升序）
 func InsertionSort(src []int) []int {
     if len(src) == 0 || len(src) == 1 {
@@ -334,3 +338,199 @@ func HeapSort(arr []int) []int {
     return arr
 }
 
+// 分割
+func partition1(src []int, p, r int) int {
+    // 以最后一位作为分割点
+    x := src[r]
+    i := p - 1
+    for j := p; j < r; j++ {
+        if src[j] <= x {
+            i++
+            src[i], src[j] = src[j], src[i]
+        }
+    }
+    src[i+1], src[r] = src[r], src[i+1]
+    return i + 1
+}
+
+// QuickSort1 快速排序
+func QuickSort1(src []int, p, r int) []int {
+    if p < r {
+        q := partition1(src, p, r)
+        QuickSort1(src, p, q-1)
+        QuickSort1(src, q+1, r)
+    }
+    return src
+}
+
+func partition2(src []int, p, r int) int {
+    x := src[r]
+    i := p - 1
+    for j := p; j < r; j++ {
+        if src[j] < x {
+            i++
+            src[i], src[j] = src[j], src[i]
+        }
+        if src[j] == x {
+            i++
+        }
+    }
+    if i == r-1 {
+        return (p + r) / 2
+    }
+    src[i+1], src[r] = src[r], src[i+1]
+    return i + 1
+}
+
+func RandomQuickSort(src []int, p, r int) []int {
+    if p < r {
+        q := randomPartition(src, p, r)
+        RandomQuickSort(src, p, q-1)
+        RandomQuickSort(src, q+1, r)
+    }
+    return src
+}
+
+func randomPartition(src []int, p, r int) int {
+    i := RandInt(r, p)
+    src[i], src[r] = src[r], src[i]
+    return partition1(src, p, r)
+}
+
+func RandInt(max, min int) int {
+    if min >= max || min == 0 || max == 0 {
+        return max
+    }
+    return rand.Intn(max-min) + min
+}
+
+// QuickSort2 尾递归快速排序
+func QuickSort2(src []int, p, r int) []int {
+    for p < r {
+        q := partition1(src, p , r)
+        QuickSort2(src, p, q-1)
+        p = q+1
+    }
+    return src
+}
+
+// CountingSort1 稳定 计数排序
+func CountingSort1(src []int, k int) []int {
+    res := make([]int, len(src))
+    tmp := make([]int, k+1)
+    for i:=0;i<k+1;i++ {
+        tmp[i]=0
+    }
+    for j:=0;j<len(src);j++ {
+        tmp[src[j]]++
+    }
+    for i:=1;i<k+1;i++ {
+        tmp[i] = tmp[i] + tmp[i-1]
+    }
+    //fmt.Println(tmp)
+    for j:=len(src)-1;j>=0;j-- {
+        res[tmp[src[j]]-1] = src[j]
+        tmp[src[j]]--
+    }
+    return res
+}
+
+// CountingSort2 不稳定 计数排序
+func CountingSort2(src []int, k int) []int {
+    res := make([]int, 0, len(src))
+    tmp := make([]int, k+1)
+    for i:=0;i<k+1;i++ {
+        tmp[i]=0
+    }
+    for j:=0;j<len(src);j++ {
+        tmp[src[j]]++
+    }
+    for i:=0;i<k+1;i++ {
+        if tmp[i] == 0{
+            continue
+        }
+        for j:=0;j<tmp[i];j++ {
+            res = append(res, i)
+        }
+    }
+    return res
+}
+
+// BucketSort 桶排序
+func BucketSort(src []int, bucketSize int) []int {
+    // 1. 找到最大值和最小值
+    minValue := src[0]
+    maxValue := src[0]
+
+    for i := 0; i<len(src); i++ {
+        if minValue > src[i] {
+            minValue = src[i]
+        }
+        if maxValue < src[i] {
+            maxValue = src[i]
+        }
+    }
+
+    // 2. 桶切片初始化
+    // 桶数 = 最大值-最小值 / 桶的大小 + 1
+    bucketCount := make([][]int,(maxValue - minValue) / bucketSize +1)
+
+    // 3. 数据入桶
+    // 找到对应的桶的索引，将数据写入
+    for i := 0; i<len(src); i++ {
+        bucketCount[(src[i] - minValue) / bucketSize] = append(bucketCount[(src[i] - minValue) / bucketSize] , src[i])
+    }
+    // 4. 将非零的桶中的数据进行排序，写回原有的数组
+    key := 0
+    for _, bucket := range bucketCount {
+        if len(bucket) == 0 {
+            continue
+        }
+        bucket = InsertionSort(bucket)
+        for _, value := range bucket {
+            src[key] = value
+            key++
+        }
+    }
+    return src
+}
+
+func InsertionByDignit(src []int, d int) {
+    if len(src) == 0 {
+        return
+    }
+    for i:=1;i<len(src);i++ {
+        key := src[i]
+        j := i-1
+        for j >=0 && src[j]/d > key/d {
+            src[j+1] = src[j]
+            j--
+        }
+        src[j+1] = key
+    }
+}
+
+// RadixSort 基数排序
+func RadixSort(src []int) []int {
+    if len(src) == 0 {
+        return nil
+    }
+    // 1. 找到最大值
+    max := src[0]
+    for i:=1;i<len(src);i++ {
+        if src[i]>max {
+            max = src[i]
+        }
+    }
+    // 2. 找到最大位数
+    d := 1
+    for max >= 10 {
+        max /= 10
+        d*=10
+    }
+
+    for c:=1;c!=d;c*=10{
+        InsertionByDignit(src, c)
+    }
+    return src
+}
