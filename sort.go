@@ -2,6 +2,7 @@ package main
 
 import (
     "math/rand"
+    "time"
 )
 
 // InsertionSort 插入排序(升序）
@@ -495,7 +496,7 @@ func BucketSort(src []int, bucketSize int) []int {
     return src
 }
 
-func InsertionByDignit(src []int, d int) {
+func InsertionByDigit(src []int, d int) {
     if len(src) == 0 {
         return
     }
@@ -530,7 +531,61 @@ func RadixSort(src []int) []int {
     }
 
     for c:=1;c!=d;c*=10{
-        InsertionByDignit(src, c)
+        InsertionByDigit(src, c)
     }
     return src
 }
+
+// SelectSort 选择排序
+func SelectSort(src []int) {
+    l := len(src)
+    if l == 0 {
+        return
+    }
+    for i:=0;i<l;i++ {
+        min := i
+        for j:=l-1;j>i;j-- {
+            if src[min] > src[j] {
+                min = j
+            }
+        }
+        src[i], src[min] = src[min], src[i]
+    }
+}
+
+// ShellSort 希尔排序
+func ShellSort(src []int, gap int) {
+    l := len(src)
+    for step:=l/gap; step>=1; step/=gap {
+        for i:=0;i<step;i++ {
+            InsertionSortByStep(src, step)
+        }
+    }
+}
+
+func InsertionSortByStep(src []int, step int) {
+    for j:=step;j<len(src);j+=step {
+        key := src[j]
+        i := j-step
+        for i>=0 && src[i] > key {
+            src[i+step] = src[i]
+            i-=step
+        }
+        src[i+step] = key
+    }
+}
+
+// RandomIntSlice 随机一个整数切片
+func RandomIntSlice(length int, limit int) []int {
+    if length==0 || limit == 0 {
+        return nil
+    }
+    res := make([]int, 0, length)
+    rand.Seed(time.Now().Unix())
+    for i:=0;i<length;i++ {
+        res = append(res, rand.Intn(limit))
+    }
+    return res
+}
+
+
