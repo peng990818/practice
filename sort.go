@@ -419,9 +419,6 @@ func QuickSort2(src []int, p, r int) []int {
 func CountingSort1(src []int, k int) []int {
     res := make([]int, len(src))
     tmp := make([]int, k+1)
-    for i:=0;i<k+1;i++ {
-        tmp[i]=0
-    }
     for j:=0;j<len(src);j++ {
         tmp[src[j]]++
     }
@@ -496,46 +493,45 @@ func BucketSort(src []int, bucketSize int) []int {
     return src
 }
 
-func InsertionByDigit(src []int, d int) {
+// RadixSort 基数排序
+func RadixSort(src []int) {
     if len(src) == 0 {
         return
     }
-    for i:=1;i<len(src);i++ {
-        key := src[i]
-        j := i-1
-        for j >=0 && src[j]/d > key/d {
-            src[j+1] = src[j]
-            j--
-        }
-        src[j+1] = key
-    }
-}
-
-// RadixSort 基数排序
-func RadixSort(src []int) []int {
-    if len(src) == 0 {
-        return nil
-    }
-    // 1. 找到最大值
+    // 找到最大值
     max := src[0]
     for i:=1;i<len(src);i++ {
-        if src[i]>max {
+        if src[i] > max {
             max = src[i]
         }
     }
-    // 2. 找到最大位数
+    // 找到最大位数
+    c := 1
+    for max>=10 {
+        max/=10
+        c++
+    }
     d := 1
-    for max >= 10 {
-        max /= 10
+    for i:=0;i<c;i++ {
+        InsertionSortByDigit(src, d)
         d*=10
     }
-
-    for c:=1;c!=d;c*=10{
-        InsertionByDigit(src, c)
-    }
-    return src
 }
 
+func InsertionSortByDigit(src []int, d int) {
+    if len(src) == 0 {
+        return
+    }
+    for j:=1;j<len(src);j++ {
+        key := src[j]
+        i := j-1
+        for i>=0&&src[i]/d%10>key/d%10 {
+            src[i+1] = src[i]
+            i--
+        }
+        src[i+1] = key
+    }
+}
 // SelectSort 选择排序
 func SelectSort(src []int) {
     l := len(src)
