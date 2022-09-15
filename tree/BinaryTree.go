@@ -1,4 +1,4 @@
-package main
+package tree
 
 import "fmt"
 
@@ -67,7 +67,7 @@ func CreateBinarySearchTree(src []int) *Node {
     }
     var root *Node
     for _, v := range src {
-        //Insert1(&root, v)
+        // Insert1(&root, v)
         Insert2(&root, v)
     }
     return root
