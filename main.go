@@ -38,22 +38,22 @@ func main() {
       tree.Inorder(res)*/
 
     src := []int{11, 2, 14, 1, 7, 15, 5, 8}
-    tree.CreateRBT(src, len(src))
-    tree.Traversal(tree.PRBT)
+    rbt := tree.CreateRBT(src, len(src))
+    tree.Traversal(rbt.Root)
     fmt.Println("===================")
-    tree.DeleteNode(tree.PRBT, 1)
-    tree.Traversal(tree.PRBT)
-    fmt.Println("===================")
-
-    tree.DeleteNode(tree.PRBT, 7)
-    tree.Traversal(tree.PRBT)
+    rbt.DeleteNode(rbt.Root, 1)
+    tree.Traversal(rbt.Root)
     fmt.Println("===================")
 
-    tree.DeleteNode(tree.PRBT, 14)
-    tree.Traversal(tree.PRBT)
+    rbt.DeleteNode(rbt.Root, 7)
+    tree.Traversal(rbt.Root)
     fmt.Println("===================")
 
-    tree.DeleteNode(tree.PRBT, 15)
-    tree.Traversal(tree.PRBT)
+    rbt.DeleteNode(rbt.Root, 14)
+    tree.Traversal(rbt.Root)
+    fmt.Println("===================")
+
+    rbt.DeleteNode(rbt.Root, 15)
+    tree.Traversal(rbt.Root)
     fmt.Println("===================")
 }

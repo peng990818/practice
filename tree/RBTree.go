@@ -17,10 +17,12 @@ type RBT struct {
     pFather *RBT
 }
 
-var PRBT *RBT = nil
+type RBTree struct {
+    Root *RBT
+}
 
 // RightRotate 右旋
-func RightRotate(pTree *RBT) {
+func (r *RBTree) RightRotate(pTree *RBT) {
     // 1. 校验
     if pTree == nil || pTree.pLeft == nil {
         return
@@ -40,7 +42,7 @@ func RightRotate(pTree *RBT) {
         }
     } else {
         // 根
-        PRBT = pMark
+        r.Root = pMark
     }
 
     // 3. 三个父亲
@@ -52,7 +54,7 @@ func RightRotate(pTree *RBT) {
 }
 
 // LeftRotate 左旋
-func LeftRotate(pTree *RBT) {
+func (r *RBTree) LeftRotate(pTree *RBT) {
     // 1. 校验
     if pTree == nil || pTree.pRight == nil {
         return
@@ -72,7 +74,7 @@ func LeftRotate(pTree *RBT) {
         }
     } else {
         // 根
-        PRBT = pMark
+        r.Root = pMark
     }
 
     // 3. 三个父亲
@@ -84,7 +86,7 @@ func LeftRotate(pTree *RBT) {
 }
 
 // Search 查找插入节点的位置
-func Search(pTree *RBT, nNum int) *RBT {
+func (r *RBTree) Search(pTree *RBT, nNum int) *RBT {
     if pTree == nil {
         return nil
     }
@@ -110,7 +112,7 @@ func Search(pTree *RBT, nNum int) *RBT {
 }
 
 // GetUncle 获取叔叔节点
-func GetUncle(pNode *RBT) *RBT {
+func (r *RBTree) GetUncle(pNode *RBT) *RBT {
     if pNode == pNode.pFather.pLeft {
         return pNode.pFather.pRight
     } else {
@@ -119,9 +121,9 @@ func GetUncle(pNode *RBT) *RBT {
 }
 
 // AddNode 插入节点
-func AddNode(pTree *RBT, nNum int) {
+func (r *RBTree) AddNode(pTree *RBT, nNum int) {
     // 查找
-    pNode := Search(pTree, nNum)
+    pNode := r.Search(pTree, nNum)
 
     pTemp := new(RBT)
     pTemp.nValue = nNum
@@ -132,8 +134,8 @@ func AddNode(pTree *RBT, nNum int) {
 
     // 1. 根 直接插入
     if pNode == nil {
-        PRBT = pTemp
-        PRBT.nColor = BLACK
+        r.Root = pTemp
+        r.Root.nColor = BLACK
         return
     }
 
@@ -156,7 +158,7 @@ func AddNode(pTree *RBT, nNum int) {
 
     for pNode.nColor == RED {
         pGrandFather = pNode.pFather
-        pUncle = GetUncle(pNode)
+        pUncle = r.GetUncle(pNode)
 
         // 3.1 叔叔是红的
         // 祖父节点变成红色
@@ -173,7 +175,7 @@ func AddNode(pTree *RBT, nNum int) {
 
             // 根
             if pNode == nil {
-                PRBT.nColor = BLACK
+                r.Root.nColor = BLACK
                 break
             }
             continue
@@ -189,7 +191,7 @@ func AddNode(pTree *RBT, nNum int) {
                 // 插入节点涂黑，祖父节点变红
                 if pTemp == pNode.pRight {
                     pTemp = pNode
-                    LeftRotate(pTemp)
+                    r.LeftRotate(pTemp)
                     pNode = pTemp.pFather
                 }
 
@@ -199,7 +201,7 @@ func AddNode(pTree *RBT, nNum int) {
                 if pTemp == pNode.pLeft {
                     pNode.nColor = BLACK
                     pGrandFather.nColor = RED
-                    RightRotate(pGrandFather)
+                    r.RightRotate(pGrandFather)
                     break
                 }
             }
@@ -212,7 +214,7 @@ func AddNode(pTree *RBT, nNum int) {
                 // 祖父节点变成红色
                 if pTemp == pNode.pLeft {
                     pTemp = pNode
-                    RightRotate(pTree)
+                    r.RightRotate(pTree)
                     pNode = pTemp.pFather
                     continue
                 }
@@ -224,7 +226,7 @@ func AddNode(pTree *RBT, nNum int) {
                 if pTemp == pNode.pRight {
                     pNode.nColor = BLACK
                     pGrandFather.nColor = RED
-                    LeftRotate(pGrandFather)
+                    r.LeftRotate(pGrandFather)
                     break
                 }
             }
@@ -233,7 +235,7 @@ func AddNode(pTree *RBT, nNum int) {
 }
 
 // FindNode 查找节点
-func FindNode(pTree *RBT, nNum int) *RBT {
+func (r *RBTree) FindNode(pTree *RBT, nNum int) *RBT {
     for pTree != nil {
         if pTree.nValue == nNum {
             return pTree
@@ -246,13 +248,13 @@ func FindNode(pTree *RBT, nNum int) *RBT {
     return nil
 }
 
-func DeleteNode(pTree *RBT, nNum int) {
+func (r *RBTree) DeleteNode(pTree *RBT, nNum int) {
     if pTree == nil {
         return
     }
 
     // 查找
-    pTemp := FindNode(pTree, nNum)
+    pTemp := r.FindNode(pTree, nNum)
     if pTemp == nil {
         return
     }
@@ -276,19 +278,19 @@ func DeleteNode(pTree *RBT, nNum int) {
         // 没有孩子
         if pTemp.pLeft == nil && pTemp.pRight == nil {
             pTemp = nil
-            PRBT = nil
+            r.Root = nil
             return
         }
 
         // 有一个红孩子
         if pTemp.pLeft != nil || pTemp.pRight != nil {
             if pTemp.pLeft != nil {
-                PRBT = pTemp.pLeft
+                r.Root = pTemp.pLeft
             } else {
-                PRBT = pTemp.pRight
+                r.Root = pTemp.pRight
             }
-            PRBT.nColor = BLACK
-            PRBT.pFather = nil
+            r.Root.nColor = BLACK
+            r.Root.pFather = nil
             pTemp = nil
             return
         }
@@ -329,7 +331,7 @@ func DeleteNode(pTree *RBT, nNum int) {
     }
 
     // 4. 非根 黑 且无孩子
-    pBrother := GetUncle(pTemp)
+    pBrother := r.GetUncle(pTemp)
     // 假删除
     if pTemp == pNode.pLeft {
         pNode.pLeft = nil
@@ -346,14 +348,14 @@ func DeleteNode(pTree *RBT, nNum int) {
             pNode.nColor = RED
             // 4.1.1 兄弟是父亲的右
             if pBrother == pNode.pRight {
-                LeftRotate(pNode)
+                r.LeftRotate(pNode)
                 pBrother = pNode.pRight
                 continue
             }
 
             // 4.1.2 兄弟是父亲的左
             if pBrother == pNode.pLeft {
-                RightRotate(pNode)
+                r.RightRotate(pNode)
                 pBrother = pNode.pLeft
                 continue
             }
@@ -382,7 +384,7 @@ func DeleteNode(pTree *RBT, nNum int) {
                         break
                     }
 
-                    pBrother = GetUncle(pTemp)
+                    pBrother = r.GetUncle(pTemp)
                     continue
                 }
             }
@@ -395,7 +397,7 @@ func DeleteNode(pTree *RBT, nNum int) {
                     pBrother.nColor = RED
                     pBrother.pLeft.nColor = BLACK
 
-                    RightRotate(pBrother)
+                    r.RightRotate(pBrother)
 
                     pBrother = pNode.pRight
                     continue
@@ -406,7 +408,7 @@ func DeleteNode(pTree *RBT, nNum int) {
                     pNode.nColor = BLACK
                     pBrother.pLeft.nColor = BLACK
 
-                    RightRotate(pNode)
+                    r.RightRotate(pNode)
                     break
                 }
             }
@@ -418,7 +420,7 @@ func DeleteNode(pTree *RBT, nNum int) {
                     pBrother.nColor = RED
                     pBrother.pRight.nColor = BLACK
 
-                    LeftRotate(pBrother)
+                    r.LeftRotate(pBrother)
                     pBrother = pNode.pLeft
                     continue
                 }
@@ -428,7 +430,7 @@ func DeleteNode(pTree *RBT, nNum int) {
                     pNode.nColor = BLACK
                     pBrother.pRight.nColor = BLACK
 
-                    LeftRotate(pNode)
+                    r.LeftRotate(pNode)
                     break
                 }
             }
@@ -438,10 +440,12 @@ func DeleteNode(pTree *RBT, nNum int) {
     pMark = nil
 }
 
-func CreateRBT(src []int, nLength int) {
+func CreateRBT(src []int, nLength int) *RBTree {
+    rbt := &RBTree{Root: nil}
     for i := 0; i < nLength; i++ {
-        AddNode(PRBT, src[i])
+        rbt.AddNode(rbt.Root, src[i])
     }
+    return rbt
 }
 
 func Traversal(pTree *RBT) {
